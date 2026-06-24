@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="The four dials that rebalance the Indian plate. Drag protein, fat, fibre and simple carbs — watch your meal change in real time.">
+<title>The Four Dials — Masala Body</title>
+<style>
+  :root{
+    --paper:#FBF5EC;
+    --ink:#1C1714;
+    --ink-soft:#5A4F47;
+    --line:#E0D4C2;
+    --turmeric:#E8A33D;
+    --chilli:#C13B2A;
+    --tamarind:#7A4A2B;
+    --leaf:#4E7A3A;
+    --indigo:#3A5A78;
+    --card:#FFFCF6;
+    --shadow:rgba(40,28,18,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:
+      radial-gradient(circle at 12% 8%, rgba(232,163,61,.10), transparent 40%),
+      radial-gradient(circle at 88% 92%, rgba(193,59,42,.07), transparent 45%),
+      var(--paper);
+    color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    line-height:1.5;
+    min-height:100vh;
+    padding:clamp(16px,4vw,48px) clamp(14px,4vw,40px);
+  }
+  .wrap{max-width:1060px;margin:0 auto}
+
+  /* ---------- masthead ---------- */
+  .brand{
+    display:inline-flex;align-items:center;gap:9px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--chilli);margin-bottom:22px;
+  }
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--turmeric);
+    box-shadow:0 0 0 3px rgba(232,163,61,.25)}
+  h1{
+    font-size:clamp(30px,6.4vw,58px);line-height:1.02;font-weight:800;
+    letter-spacing:-.02em;margin-bottom:14px;
+  }
+  h1 .em{color:var(--chilli);font-style:italic}
+  .lede{
+    font-size:clamp(15px,2.3vw,19px);color:var(--ink-soft);max-width:60ch;
+  }
+  .lede b{color:var(--ink);font-weight:700}
+
+  .rule{height:2px;background:repeating-linear-gradient(90deg,var(--ink) 0 18px,transparent 18px 26px);
+    opacity:.18;margin:26px 0 30px}
+
+  /* ---------- layout ---------- */
+  .stage{
+    display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(20px,3vw,40px);
+    align-items:start;
+  }
+  @media(max-width:840px){.stage{grid-template-columns:1fr}}
+
+  /* ---------- the plate ---------- */
+  .platecard{
+    background:var(--card);border:1px solid var(--line);border-radius:20px;
+    padding:clamp(18px,3vw,30px);box-shadow:0 14px 36px var(--shadow);
+    position:sticky;top:20px;
+  }
+  @media(max-width:840px){.platecard{position:static}}
+  .plate-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+  .plate-head h2{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    font-family:-apple-system,sans-serif;color:var(--ink-soft)}
+  .badge{
+    font-family:-apple-system,sans-serif;font-size:11px;font-weight:700;letter-spacing:.05em;
+    padding:4px 11px;border-radius:999px;text-transform:uppercase;transition:.4s;
+  }
+
+  .thali-wrap{position:relative;width:100%;max-width:330px;margin:6px auto 4px;aspect-ratio:1}
+  svg.thali{width:100%;height:100%;overflow:visible}
+  .rim{fill:none;stroke:var(--tamarind);stroke-width:8;opacity:.55}
+  .well{fill:#FFFEFB;stroke:var(--line);stroke-width:1.5}
+  .seg{transition:all .55s cubic-bezier(.4,0,.2,1)}
+  .seg-label{font-family:-apple-system,sans-serif;font-size:11px;font-weight:700;fill:#fff;
+    text-anchor:middle;pointer-events:none}
+  .center-cal{text-align:center;margin-top:4px}
+  .center-cal .num{font-size:clamp(36px,7vw,52px);font-weight:800;letter-spacing:-.02em;
+    line-height:1;transition:color .4s}
+  .center-cal .unit{font-family:-apple-system,sans-serif;font-size:12px;font-weight:700;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+
+  .macros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
+  .macro{background:var(--paper);border-radius:12px;padding:10px 8px;text-align:center;
+    border:1px solid var(--line)}
+  .macro .mlabel{font-family:-apple-system,sans-serif;font-size:9.5px;font-weight:700;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+  .macro .mval{font-size:21px;font-weight:800;letter-spacing:-.01em;margin-top:2px}
+  .macro.protein .mval{color:var(--leaf)}
+  .macro.fat .mval{color:var(--turmeric)}
+  .macro.carb .mval{color:var(--chilli)}
+  .macro .mpct{font-family:-apple-system,sans-serif;font-size:10px;color:var(--ink-soft);margin-top:1px}
+
+  .verdict{
+    margin-top:16px;padding:13px 15px;border-radius:13px;font-size:14.5px;line-height:1.45;
+    background:var(--paper);border-left:4px solid var(--turmeric);transition:.4s;min-height:62px;
+  }
+  .verdict b{font-weight:700}
+
+  /* ---------- dials ---------- */
+  .dials{display:flex;flex-direction:column;gap:16px}
+  .dial{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:16px 18px 18px;box-shadow:0 6px 18px var(--shadow);
+    position:relative;overflow:hidden;
+  }
+  .dial::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--accent)}
+  .dial.d1{--accent:var(--leaf)}
+  .dial.d2{--accent:var(--turmeric)}
+  .dial.d3{--accent:var(--indigo)}
+  .dial.d4{--accent:var(--chilli)}
+  .dial-top{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+  .dnum{
+    font-family:-apple-system,sans-serif;font-weight:800;font-size:13px;
+    width:30px;height:30px;flex:none;border-radius:8px;display:grid;place-items:center;
+    color:#fff;background:var(--accent);letter-spacing:.02em;
+  }
+  .dtitle{font-size:18px;font-weight:800;letter-spacing:-.01em}
+  .dtitle .verb{color:var(--accent)}
+  .dsub{font-size:13.5px;color:var(--ink-soft);margin:2px 0 13px;max-width:46ch}
+  .dsub b{color:var(--ink);font-weight:700}
+
+  .control{display:flex;align-items:center;gap:13px}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;flex:1;height:7px;border-radius:999px;
+    background:var(--line);outline:none;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);border:3px solid var(--card);cursor:grab;
+    box-shadow:0 2px 8px rgba(40,28,18,.28);transition:transform .12s;
+  }
+  input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18);cursor:grabbing}
+  input[type=range]::-moz-range-thumb{
+    width:26px;height:26px;border-radius:50%;background:var(--accent);
+    border:3px solid var(--card);cursor:grab;box-shadow:0 2px 8px rgba(40,28,18,.28);
+  }
+  input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(58,90,120,.4)}
+  .readout{
+    font-family:-apple-system,sans-serif;font-weight:800;font-size:14px;
+    min-width:128px;text-align:right;color:var(--ink-soft);font-variant-numeric:tabular-nums;
+  }
+  .readout b{color:var(--accent);font-size:15px}
+
+  /* ---------- footer / reset ---------- */
+  .foot{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;
+    margin-top:30px;padding-top:22px;border-top:1px solid var(--line)}
+  .foot p{font-size:13px;color:var(--ink-soft);max-width:52ch}
+  .reset{
+    font-family:-apple-system,sans-serif;font-weight:700;font-size:13px;letter-spacing:.04em;
+    border:1.5px solid var(--ink);background:transparent;color:var(--ink);
+    padding:10px 20px;border-radius:999px;cursor:pointer;transition:.18s;white-space:nowrap;
+  }
+  .reset:hover{background:var(--ink);color:var(--paper)}
+  .reset:active{transform:translateY(1px)}
+
+  .note{font-family:-apple-system,sans-serif;font-size:11px;color:var(--ink-soft);
+    text-align:center;margin-top:22px;opacity:.8;letter-spacing:.02em}
+
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand"><span class="dot"></span>Masala&nbsp;Body&nbsp;·&nbsp;The&nbsp;Re-balanced Plate</div>
+
+  <h1>The Four <span class="em">Dials</span></h1>
+  <p class="lede">Your traditional thali isn't wrong — the world underneath it changed and the recipe didn't.
+    You don't need quinoa or kale. You need four small turns. <b>Drag each dial. Watch the same plate
+    become a better one.</b></p>
+
+  <div class="rule"></div>
+
+  <div class="stage">
+
+    <!-- ===== PLATE ===== -->
+    <div class="platecard">
+      <div class="plate-head">
+        <h2>Your Plate</h2>
+        <span class="badge" id="badge">Default Thali</span>
+      </div>
+
+      <div class="thali-wrap">
+        <svg class="thali" viewBox="0 0 200 200" aria-hidden="true">
+          <circle class="rim" cx="100" cy="100" r="92"/>
+          <circle class="well" cx="100" cy="100" r="82"/>
+          <g id="rings"></g>
+        </svg>
+      </div>
+
+      <div class="center-cal">
+        <div class="num" id="kcal">—</div>
+        <div class="unit">kcal · one meal</div>
+      </div>
+
+      <div class="macros">
+        <div class="macro protein"><div class="mlabel">Protein</div><div class="mval" id="pG">—</div><div class="mpct" id="pP">—</div></div>
+        <div class="macro fat"><div class="mlabel">Fat</div><div class="mval" id="fG">—</div><div class="mpct" id="fP">—</div></div>
+        <div class="macro carb"><div class="mlabel">Carbs</div><div class="mval" id="cG">—</div><div class="mpct" id="cP">—</div></div>
+      </div>
+
+      <div class="verdict" id="verdict"></div>
+    </div>
+
+    <!-- ===== DIALS ===== -->
+    <div class="dials">
+
+      <div class="dial d1">
+        <div class="dial-top"><span class="dnum">1</span>
+          <span class="dtitle"><span class="verb">Add</span> Protein</span></div>
+        <p class="dsub">The most filling thing you can eat — it shouts to your gut hormones to stop.
+          <b>Double the dal, add paneer or egg.</b></p>
+        <div class="control">
+          <input type="range" id="d1" min="0" max="100" value="0" aria-label="Add protein">
+          <span class="readout" id="r1"></span>
+        </div>
+      </div>
+
+      <div class="dial d2">
+        <div class="dial-top"><span class="dnum">2</span>
+          <span class="dtitle"><span class="verb">Reduce</span> Fat</span></div>
+        <p class="dsub">9 calories a gram — twice anything else. <b>Swap the free-pour glug for a
+          spoon or a spray.</b> Tastes like nothing, costs a fortune.</p>
+        <div class="control">
+          <input type="range" id="d2" min="0" max="100" value="0" aria-label="Reduce fat">
+          <span class="readout" id="r2"></span>
+        </div>
+      </div>
+
+      <div class="dial d3">
+        <div class="dial-top"><span class="dnum">3</span>
+          <span class="dtitle"><span class="verb">Add</span> Fibre</span></div>
+        <p class="dsub">The dial we sanded down on purpose. <b>Hand-pounded rice, whole atta,
+          a rotation of millets, skins left on.</b> Fullness a steam mill stole back.</p>
+        <div class="control">
+          <input type="range" id="d3" min="0" max="100" value="0" aria-label="Add fibre">
+          <span class="readout" id="r3"></span>
+        </div>
+      </div>
+
+      <div class="dial d4">
+        <div class="dial-top"><span class="dnum">4</span>
+          <span class="dtitle"><span class="verb">Reduce</span> Simple Carbs</span></div>
+        <p class="dsub">Not anti-carb — anti-spike. <b>Smaller hill of white rice, no drinking
+          your sugar.</b> Re-proportion so grain is a part of the meal, not the meal.</p>
+        <div class="control">
+          <input type="range" id="d4" min="0" max="100" value="0" aria-label="Reduce simple carbs">
+          <span class="readout" id="r4"></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="foot">
+    <p>Same dal-chawal you already love, re-proportioned. More protein, less fat, more fibre,
+      fewer simple carbs — and keep every bit of the masala.</p>
+    <button class="reset" id="reset">⟲ Back to the default thali</button>
+  </div>
+
+  <p class="note">Rough ready-reckoner values for everyday intuition, not lab-exact figures.
+    Built in the spirit of the Masala Body protein cheatsheet.</p>
+
+</div>
+
+<script>
+/* ---------- model: one "virtuous home-cooked" meal ----------
+   Default = ~60–65% carb, ~10–12% protein, heavy free-pour fat.
+   Each dial 0→100 turns that meal toward a re-balanced plate. */
+const BASE = { protein:11, fat:22, carb:78 }; // grams in the default meal
+
+// dial effects at full (100%), in grams added/removed
+const FX = {
+  d1:{ protein:+18 },                 // double dal + egg/paneer
+  d2:{ fat:-15 },                     // free-pour -> spoon/spray
+  d3:{ carb:+4, fibreFull:1 },        // whole grains: small carb shift, big satiety
+  d4:{ carb:-26 }                     // smaller rice hill, no liquid sugar
+};
+
+const els = {
+  kcal:document.getElementById('kcal'),
+  pG:document.getElementById('pG'), pP:document.getElementById('pP'),
+  fG:document.getElementById('fG'), fP:document.getElementById('fP'),
+  cG:document.getElementById('cG'), cP:document.getElementById('cP'),
+  badge:document.getElementById('badge'),
+  verdict:document.getElementById('verdict'),
+  rings:document.getElementById('rings')
+};
+const sliders=[1,2,3,4].map(i=>document.getElementById('d'+i));
+const reads=[1,2,3,4].map(i=>document.getElementById('r'+i));
+
+const readoutText={
+  d1:v=>v<5?'free pour dal':v<50?'+'+Math.round(v/100*1)+' katori dal':'double dal + egg',
+  d2:v=>v<5?'the free pour':v<50?'holed-lid drizzle':'a measured spoon',
+  d3:v=>v<5?'polished white':v<50?'part hand-pounded':'whole-grain + millets',
+  d4:v=>v<5?'mountain of rice':v<50?'smaller hill':'re-proportioned'
+};
+
+function compute(){
+  const v=sliders.map(s=>+s.value/100); // [d1..d4] 0..1
+  let protein=BASE.protein + FX.d1.protein*v[0];
+  let fat    =BASE.fat     + FX.d2.fat*v[1];
+  let carb   =BASE.carb    + FX.d3.carb*v[2] + FX.d4.carb*v[3];
+  const fibreBoost=v[2]; // 0..1 satiety from fibre dial
+
+  protein=Math.max(0,protein); fat=Math.max(0,fat); carb=Math.max(0,carb);
+  const kcal=Math.round(protein*4 + fat*9 + carb*4);
+  const total=protein*4+fat*9+carb*4||1;
+  const pPct=Math.round(protein*4/total*100);
+  const fPct=Math.round(fat*9/total*100);
+  const cPct=Math.round(carb*4/total*100);
+  return {protein,fat,carb,kcal,pPct,fPct,cPct,fibreBoost,v};
+}
+
+function render(){
+  const m=compute();
+  els.kcal.textContent=m.kcal;
+  els.pG.textContent=Math.round(m.protein)+'g';
+  els.fG.textContent=Math.round(m.fat)+'g';
+  els.cG.textContent=Math.round(m.carb)+'g';
+  els.pP.textContent=m.pPct+'%'; els.fP.textContent=m.fPct+'%'; els.cP.textContent=m.cPct+'%';
+
+  // kcal colour: green when meal gets leaner
+  const lean=Math.max(0,Math.min(1,(620-m.kcal)/(620-360)));
+  els.kcal.style.color=mix('#C13B2A','#4E7A3A',lean);
+
+  reads.forEach((r,i)=>{
+    const id='d'+(i+1), val=+sliders[i].value;
+    r.innerHTML='<b>'+val+'%</b> · '+readoutText[id](val);
+  });
+
+  drawPlate(m);
+  judge(m);
+}
+
+/* concentric proportion rings: carb (outer) / fat / protein (inner) */
+function drawPlate(m){
+  const total=m.protein*4+m.fat*9+m.carb*4||1;
+  const segs=[
+    {pct:m.carb*4/total,  color:'#C13B2A', label:'carb'},
+    {pct:m.fat*9/total,   color:'#E8A33D', label:'fat'},
+    {pct:m.protein*4/total,color:'#4E7A3A',label:'protein'}
+  ];
+  // draw as stacked arcs around the well, radius shells
+  const cx=100,cy=100, rOuter=70, rInner=20, band=(rOuter-rInner);
+  let acc=0, html='';
+  segs.forEach(s=>{
+    const r0=rInner+band*acc;
+    const r1=rInner+band*(acc+s.pct);
+    acc+=s.pct;
+    html+=`<circle class="seg" cx="${cx}" cy="${cy}" r="${(r0+r1)/2}"
+            fill="none" stroke="${s.color}" stroke-width="${Math.max(0,(r1-r0))}"/>`;
+  });
+  // fibre glow ring if dial 3 engaged
+  if(m.fibreBoost>0.05){
+    html+=`<circle class="seg" cx="${cx}" cy="${cy}" r="${rOuter+5}" fill="none"
+            stroke="#3A5A78" stroke-width="2.5" stroke-dasharray="3 5"
+            opacity="${(0.25+m.fibreBoost*0.55).toFixed(2)}"/>`;
+  }
+  els.rings.innerHTML=html;
+}
+
+function judge(m){
+  const b=els.badge, vd=els.verdict;
+  const allMax=m.v.every(x=>x>0.85);
+  const allZero=m.v.every(x=>x<0.05);
+  let text,bg,bd,bcol,btext;
+
+  if(allZero){
+    text='<b>The default day.</b> Mostly grain, a small katori of dal, a free-pour of oil. Healthy by reputation — but ~65% carbs and barely 11% protein. The auto-renewing subscription.';
+    bd='var(--chilli)'; bcol='rgba(193,59,42,.14)'; btext='var(--chilli)'; b.textContent='Default Thali';
+  } else if(allMax){
+    text="<b>The re-balanced plate.</b> Same dal-chawal, re-proportioned. Protein shouts \u201cfull,\u201d fat stopped sneaking in, fibre slowed the spike. This beats a quinoa bowl — and it costs less.";
+    bd='var(--leaf)'; bcol='rgba(78,122,58,.16)'; btext='var(--leaf)'; b.textContent='Re-balanced ✓';
+  } else if(m.pPct>=18 && m.kcal<540){
+    text='<b>Getting there.</b> Protein is climbing and the calories are honest now. Nudge the last dials — whole grains and a smaller rice hill — to finish the rebalance.';
+    bd='var(--turmeric)'; bcol='rgba(232,163,61,.16)'; btext='var(--tamarind)'; b.textContent='On the way';
+  } else {
+    text='<b>One turn at a time.</b> Each dial does one job: protein fills you, less fat cuts hidden calories, fibre slows you down, fewer simple carbs flatten the spike. Keep going.';
+    bd='var(--turmeric)'; bcol='rgba(232,163,61,.16)'; btext='var(--tamarind)'; b.textContent='Adjusting…';
+  }
+  vd.innerHTML=text; vd.style.borderLeftColor=bd;
+  b.style.background=bcol; b.style.color=btext;
+}
+
+/* tiny hex mixer */
+function mix(a,b,t){
+  const pa=[1,3,5].map(i=>parseInt(a.substr(i,2),16));
+  const pb=[1,3,5].map(i=>parseInt(b.substr(i,2),16));
+  const c=pa.map((x,i)=>Math.round(x+(pb[i]-x)*t));
+  return 'rgb('+c.join(',')+')';
+}
+
+sliders.forEach(s=>s.addEventListener('input',render));
+document.getElementById('reset').addEventListener('click',()=>{
+  sliders.forEach(s=>s.value=0); render();
+});
+render();
+</script>
+</body>
+</html>
